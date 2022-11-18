@@ -26,4 +26,14 @@ router.get('/:id', (req, res) => {
     .catch((err) => console.log(err));
 })
 
+// POST news videos
+router.post('/', (req, res) => {
+    axios
+    .post(`${VIDEOS_API}`)
+    .then((apiResponse) => {
+        res.status(200).json(apiResponse.data);
+        })
+    .catch((err) => console.log(err));
+})
+
 module.exports = router;
