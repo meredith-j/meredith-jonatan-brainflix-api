@@ -1,39 +1,71 @@
 const express = require('express');
 const router = express.Router();
+const { readFile, saveVideo } = require ("../models/videosModels");
+const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
-const axios = require('axios');
+const PORT = process.env.PORT;
 
 const VIDEOS_API = process.env.VIDEOS_API;
 
-const readFile = () => {
-    return JSON.parse(fs.readFileSync('./data/videos.json'))
-}
-
 
 // GET videos
-router.get('/', (req, res) => {
-    const allVideos = readFile();
-    res.status(200).json(allVideos)
-})
+router.route('/')
+    .get((req, res) => {
+        const getVideos = readFile()
+        res.status(200).json(getVideos.map((video) => {
+            return {
+                id: video.id,
+                title: video.title,
+                channel: video.channel,
+                image: video.image
+            }
+        }))
+    })
+   .post((req, res) => {
+    if (!req.body.title || !req.body.description) {
+        return res.status(400).json({
+            message: "All fields are required"
+        })
+    }
+
+    const newVideo = {
+        id: uuidv4(),
+        title: req.body.title,
+        channel: "Your channel",
+        image: req.body.image,
+        description: req.body.description,
+        views: 0,
+        likes: 0,
+        duration: 0,
+        video: "https://project-2-api.herokuapp.com/stream",
+        timestamp: Date.now(),
+        comments: [],
+    }
+
+    const videos = readFile();
+    videos.push(newVideo);
+    saveVideo(videos);
+
+    res.status(200).json({message: "yeehaw"})
+
+   })
 
 // GET video by ID
-router.get('/:id', (req, res) => {
-    axios
-    .get(`${VIDEOS_API}`)
-    .then((apiResponse) => {
-        res.status(200).json(apiResponse.data);
-    })
-    .catch((err) => console.log(err));
-})
-
-// POST news videos
-router.post('/', (req, res) => {
-    axios
-    .post(`${VIDEOS_API}`)
-    .then((apiResponse) => {
-        res.status(200).json(apiResponse.data);
+router.route('/:id')
+    .get((req, res) => {
+        const id = req.params.id;
+        const videos = readFile();
+        const video = videos.find((video) => {
+            return video.id === id;
         })
-    .catch((err) => console.log(err));
-})
+
+        if (!video) {
+            return res.status(404).json({
+                error: "Video does not exist"
+            })
+        }
+
+        res.status(200).json(video);
+    })
 
 module.exports = router;

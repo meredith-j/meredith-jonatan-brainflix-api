@@ -9,10 +9,15 @@ const videosRouter = require('./routes/videos');
 const PORT = process.env.PORT;
 
 app.use(cors());
-app.use(express.statuc('public'));
+app.use(express.static('public'));
+app.use(express.json());
 
 app.get('/', (req, res) => {
     res.send("womp womp let's hope this works")
+});
+
+app.get('/id', (req, res) => {
+    res.send("doo doo doo let's get a video")
 });
 
 app.use('/videos', videosRouter)
