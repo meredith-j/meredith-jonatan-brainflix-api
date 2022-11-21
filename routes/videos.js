@@ -2,10 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { readFile, saveVideo } = require ("../models/videosModels");
 const { v4: uuidv4 } = require('uuid');
-const fs = require('fs');
-const PORT = process.env.PORT;
 
-const VIDEOS_API = process.env.VIDEOS_API;
 
 
 // GET videos
@@ -46,7 +43,7 @@ router.route('/')
     videos.push(newVideo);
     saveVideo(videos);
 
-    res.status(200).json({message: "yeehaw"})
+    res.status(201).json({message: "Yeehaw - all systems go, cowboy!"})
 
    })
 
